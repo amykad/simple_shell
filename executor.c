@@ -1,4 +1,11 @@
 #include "shell.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+extern char **environ;
 
 /**
  * execute_command_alternative - function to execute a command
@@ -11,7 +18,9 @@ int execute_command_alternative(char **cmd_args, char **cmd_name)
 int index;
 pid_t child_pid;
 int child_status;
+
 child_pid = fork();
+
 if (child_pid == 0)
 {
 if (execve(cmd_args[0], cmd_args, environ) == -1)

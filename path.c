@@ -30,16 +30,17 @@ if (!absolute_path)
 {
 free(relative_path);
 return (-1);
-
 }
 
-absolute_path = strcpy(absolute_path, token);
-_strcat(absolute_path, "/");
-_strcat(absolute_path, *command);
+strcpy(absolute_path, token);
+_strcat(result, "/");
+_strcat(result, *command);
 
-if (stat(absolute_path, &stat_buffer) == 0)
+if (stat(result, &stat_buffer) == 0)
 {
-*command = absolute_path;
+
+free(*command);
+*command = result;
 free(relative_path);
 return (0);
 }

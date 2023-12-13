@@ -16,7 +16,8 @@ line_length = getline(&input_line, &buffer_size, stdin);
 if (line_length == -1)
 {
 free(input_line);
-return (NULL);
-{
-return (input_line);
+return NULL;
+}
+
+return input_line;
 }
