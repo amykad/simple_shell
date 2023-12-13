@@ -11,7 +11,8 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
-
+ 
+char *custom_read_line(void);
 void print_environment(char **environment);
 int execute_command_alternative(char **cmd_args, char **cmd_name);
 char *get_path_variable(char **environment);

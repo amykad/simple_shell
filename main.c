@@ -21,7 +21,7 @@ if (isatty(STDIN_FILENO))
 printf("\n"); }
 free(original_path);
 return alternative_status; }
-alternative_command = my_tokenizer(line);
+alternative_command = tokenize(line);
 if (!alternative_command)
 {
 free(line);

@@ -1,53 +1,33 @@
 #include "shell.h"
 
 /**
- * _values_path - Finds the absolute path of the executable.
- * @command: User input command.
- * @environment: Environment variables.
- * Return: Pointer to the absolute path string.
+ * getEnvPath - get the value of the PATH variable from the environment.
+ * @environment: environment variables
+ * Return: value of PATH, or NULL if not found.
  */
-int values_path(char **command, char **environment)
+
+char *getEnvPath(char **environment)
 {
-char *token = NULL, *relative_path = NULL, *absolute_path = NULL;
-size_t command_length, path_length;
-struct stat stat_buffer;
+size_t index = 0, varIndex = 0, pathLength = 5;
+char *pathValue = NULL;
 
-if (stat(*command, &stat_buffer) == 0)
-return (-1);
+for (index = 0; strncmp(environment[index], "PATH=", 5); index++)
+		;
+if (environment[index] == NULL)
+return (NULL);
 
-relative_path = get_path(environment); /** gets the content of "PATH=" */
-if (!relative_path)
-return (-1);
+for (pathLength = 5; environment[index][varIndex]; varIndex++, pathLength++)
+		;
+pathValue = malloc(sizeof(char) * (pathLength + 1));
 
-token = strtok(relative_path, ":"); /** tokenizes the content of "PATH=" */
-command_length = _strlen(*command); /** gets length of command */
+if (pathValue == NULL)
+return (NULL);
 
-while (token)
-{
-path_length = _strlen(token);
-absolute_path = malloc(sizeof(char) * (path_length + command_length + 2));
-if (!absolute_path)
-{
-free(relative_path);
-return (-1);
-}
+for (varIndex = 5, pathLength = 0; environment[index][varIndex];
+varIndex++, pathLength++)
+pathValue[pathLength] = environment[index][varIndex];
 
-strcpy(absolute_path, token);
-_strcat(result, "/");
-_strcat(result, *command);
+pathValue[pathLength] = '\0';
 
-if (stat(result, &stat_buffer) == 0)
-{
-
-free(*command);
-*command = result;
-free(relative_path);
-return (0);
-}
-free(absolute_path);
-token = strtok(NULL, ":");
-}
-token = '\0';
-free(relative_path);
-return (-1);
+return (pathValue);
 }
