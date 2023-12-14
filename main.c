@@ -30,7 +30,7 @@ if (isatty(STDIN_FILENO))
 printf("\n");
 }
 free(original_path);
-return alternative_status;
+return (alternative_status);
 }
 
 alternative_command = tokenize(line);
@@ -70,7 +70,7 @@ if (child_pid == 0)
 setenv("PATH", original_path, 1);
 if (execvp(alternative_command[0], alternative_command) == -1)
 {
-fprintf(stderr,"%s: 1: %s: not found\n","./hsh",alternative_command[0]);
+fprintf(stderr, "%s: 1: %s: not found\n", "./hsh", alternative_command[0]);
 free(line);
 free(original_path);
 for (i = 0; alternative_command[i] != NULL; i++)
