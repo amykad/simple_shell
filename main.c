@@ -1,72 +1,112 @@
 #include "shell.h"
 
 /**
- * print_prompt - Prints the shell prompt if
- * the standard input is a terminal.
- */
-void print_prompt(void)
-{
-if (isatty(STDIN_FILENO))
-{
-printf("$ ");
-fflush(stdout);
-}
-}
-
-/**
- * cleanup - Frees allocated memory for command execution.
- * @line: The input line.
- * @alternative_command: The tokenized alternative command.
- * @original_path: The original PATH environment variable.
- */
-void cleanup(char *line, char **alternative_command, char *original_path)
-{
-free(line);
-free(original_path);
-for (int i = 0; alternative_command[i] != NULL; i++)
-{
-free(alternative_command[i]);
-}
-free(alternative_command);
-}
-
-/**
  * main - The main function for the shell program.
  *
  * Return: Returns 0 on successful execution.
  */
+
 int main(void)
 {
 char *line = NULL, **alternative_command = NULL;
 char *path = getenv("PATH");
 int alternative_status = 0;
 char *original_path = strdup(path);
-
+int i;
 while (1)
+
 {
 pid_t child_pid;
-
-print_prompt();
-ine = custom_read_line();
-
+if (isatty(STDIN_FILENO))
+{
+printf("$ ");
+fflush(stdout);
+ }
+line = custom_read_line();
 if (line == NULL)
 {
 if (isatty(STDIN_FILENO))
 {
 printf("\n");
 }
-cleanup(line, alternative_command, original_path);
-return (alternative_status);
+free(original_path);
+return alternative_status;
 }
 
 alternative_command = tokenize(line);
 if (!alternative_command)
 {
-cleanup(line, alternative_command, original_path);
+free(line);
 continue;
 }
 
-cleanup(line, alternative_command, original_path);
+if (strcmp(alternative_command[0],"exit") == 0)
+{
+free(line);
+free(original_path);
+for (i = 0; alternative_command[i] != NULL; i++)
+{
+free(alternative_command[i]);
+}
+free(alternative_command);
+exit(alternative_status);
+}
+child_pid = fork();
+
+if (child_pid == -1)
+{
+perror("fork");
+free(line);
+free(original_path);
+for (i = 0; alternative_command[i] != NULL; i++)
+{
+free(alternative_command[i]);
+}
+free(alternative_command);
+exit(EXIT_FAILURE);
+}
+if (child_pid == 0)
+{
+setenv("PATH", original_path, 1);
+if (execvp(alternative_command[0], alternative_command) == -1)
+{
+fprintf(stderr,"%s: 1: %s: not found\n","./hsh",alternative_command[0]);
+free(line);
+free(original_path);
+for (i = 0; alternative_command[i] != NULL; i++)
+{
+free(alternative_command[i]);
+}
+free(alternative_command);
+exit(127);
+}
+if (strcmp(alternative_command[0], "env") == 0)
+{
+execvp("env", alternative_command);
+perror("execvp");
+exit(1);
+}
+}
+else
+{
+int status;
+wait(&status);
+if (WIFEXITED(status))
+{
+alternative_status = WEXITSTATUS(status);
+}
+else
+{
+alternative_status = -1;
+}
+for (i = 0; alternative_command[i] != NULL; i++)
+{
+free(alternative_command[i]);
+}
+
+free(alternative_command);
+free(line);
+}
 }
 return (0);
 }
